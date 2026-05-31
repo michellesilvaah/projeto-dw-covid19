@@ -1,14 +1,12 @@
--- ============================================================
--- 03_etl_load.sql
+
 -- Carga completa do Data Warehouse
--- Popula dim_date, dim_pandemic_phase, dim_location e fact_covid
+-- dim_date, dim_pandemic_phase, dim_location e fact_covid
 -- ============================================================
 
 
--- ------------------------------------------------------------
--- ETAPA 1: Carregar dim_date
+-- PASSO 1: Carregar dim_date
 -- Gera um registro para cada dia entre 2020-01-01 e 2024-12-31
--- ------------------------------------------------------------
+
 INSERT OR IGNORE INTO dim_date
 SELECT
     CAST(strftime(range_date, '%Y%m%d') AS INTEGER)  AS date_key,
@@ -37,9 +35,10 @@ SELECT COUNT(*) AS total_dias FROM dim_date;
 
 
 -- ------------------------------------------------------------
+
 -- ETAPA 2: Carregar dim_pandemic_phase
 -- Insere manualmente as 5 fases da pandemia
--- ------------------------------------------------------------
+
 INSERT OR IGNORE INTO dim_pandemic_phase VALUES
     (1, 'Pre-pandemia',       1, 'Periodo anterior ao primeiro caso confirmado no Brasil'),
     (2, 'Primeira onda',      2, 'Primeiro pico de casos e mortes — março a setembro de 2020'),
@@ -52,9 +51,10 @@ SELECT * FROM dim_pandemic_phase;
 
 
 -- ------------------------------------------------------------
+
 -- ETAPA 3: Carregar dim_location (com SCD Type 2)
 -- Insere cada país com is_current = true
--- ------------------------------------------------------------
+
 INSERT OR IGNORE INTO dim_location
 SELECT
     ROW_NUMBER() OVER (ORDER BY iso_code)   AS location_key,
@@ -74,9 +74,10 @@ SELECT COUNT(*) AS total_paises FROM dim_location;
 
 
 -- ------------------------------------------------------------
+
 -- ETAPA 4: Carregar fact_covid
 -- Cruza os registros diários com as chaves das dimensões
--- ------------------------------------------------------------
+
 INSERT OR IGNORE INTO fact_covid
 SELECT
     ROW_NUMBER() OVER (ORDER BY d.date_key, l.location_key)  AS fact_key,
@@ -105,4 +106,4 @@ JOIN dim_location l ON l.iso_code = o.iso_code
                     AND l.is_current = true;
 
 -- Verificação final
-SELECT COUNT(*) AS total_registros_fato FROM fact_covid;
+SELECT COUNT(*) AS total_registros_fato FROM fact_covid; 
