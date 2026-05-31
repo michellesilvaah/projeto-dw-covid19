@@ -1,0 +1,5 @@
+covid_dw.duckdb
+__pycache__/
+*.pyc
+
+.venv/
