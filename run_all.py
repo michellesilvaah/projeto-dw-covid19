@@ -10,6 +10,7 @@ scripts = [
     "scripts/01_oltp.sql",
     "scripts/02_dw_model.sql",
     "scripts/03_etl_load.sql",
+    "scripts/04_analytics.sql"
 ]
 
 for script in scripts:
